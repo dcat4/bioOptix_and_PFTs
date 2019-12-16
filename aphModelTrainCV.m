@@ -1,20 +1,13 @@
-% still need to do some testing to make sure the function implementation
-% works as intended. 
-
-% this is the aph derivative model I developed, modified as a matlab
-% function rather than a script you have to modify every time. better for
-% automation and reproducibility this way. 
+% this is the aph derivative model cross-validation routine I developed.
+% details in Catlett and Siegel, 2018, JGR-Oceans.
 
 % you give it a set of aph derivative spectra (or any spectra),
 % corresponding observations of a pft index that you want to model (HPLC
 % pigment concentration or derived parameters), and specify some modeling
 % parameters (see below), and it outputs a set of spectral coefficients 
-% from the cross-validation exercise, model intercepts (arbitrary, should be
+% from the cross-validation exercise, intercepts (arbitrary, should be
 % close to zero...), and goodness of fit statistics, and saves these to a
 % .mat file with the name specified in the fcn call
-
-% the details of how the model training works are described in Catlett and Siegel,
-% 2018, JGR-Oceans. 
 
 %% input arguments:
 % 1. daph: an array with all the spectra you want to use to train the model
