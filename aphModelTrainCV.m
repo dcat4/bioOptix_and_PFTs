@@ -15,28 +15,38 @@
 % (note that the model-training slices this data set so that each of the
 % n_permutations blindly validates a model against an unknown validation
 % data set)
+
 % 2. pft: the corresponding values of the pft index you want to model with
 % your input daph spectra. in other words, the order of observations/rows
 % in pft should align with that in daph.
+
 % 3. pft_index: specifies any constraints to apply to model outputs. 
 % options: 
 % (A)'pigment' --> model outputs are constrained to be >= 0 at
 % each iteration of the model development. 
 % (B) 'EOFs' --> model outputs are not constrained
 % (C) 'compositions' --> model outputs are constrained to be >= 0 and <= 1
+
 % 4. n_permutations: the number of times you want to do the entire
 % cross-validation exercise. My go-to is 500
+
 % 5. max_pcs: the maximum number of spectral principal components that can
 % be used in model training. the model will test/use all principal components up
 % to and including this number
+% NOTE: because the model optimization chops up your data set, max_pcs needs to 
+% be less than or equal to: 0.75 * (1-1/k) * X; where k is input # 6, X is the number
+% of observations in your data set
+
 % 6. k: the number of actual model trainings to do for each of the
 % n_permutations cross-validation iterations. usually 5.
+
 % 7. mdl_pick_metric: the gof statistic you want to optimize the model off
 % of. Options:
 % (A) 'R2' --> picks mdls with maximum R2
 % (B) 'RMSE' --> picks mdls with minimum RMSE
 % (C) 'avg' --> minimum mean % error
 % (D) 'med' --> minimum median % error
+
 % 8. output_file_name: what you want the output saved as (only available as
 % .mat's right now).
 
@@ -44,11 +54,14 @@
 % 1. coefficients: an array of model coefficients that is n_permutations x
 % size(daph,2) [which should be the number of wavelengths you've have
 % derivative values for]
+
 % 2. intercepts: a vector of model intercepts (should be reasonably close
 % to 0) that is 1xn_permutations and contains the correspong intercept for
 % each set of coefficients in coefficients array
+
 % 3. summary_gofs: a summary table of goodness of fit statistics across all
 % n_permutations of model cross-validations
+
 % 4. all_gofs: a struct with each field a g.o.f statistic and each entry an
 % array detailing all statistics from each of n_permutation
 % cross-validations
@@ -183,13 +196,29 @@ function [coefficients, intercepts, summary_gofs, all_gofs] = aphModelTrainCV(da
             end
 
             if strcmp(mdl_pick_metric, 'R2') == 1
-                n_modes_to_use(j) = find(R2s == max(R2s)); % for selecting based on R^2 of predicted vs. observed
+                ii = find(R2s == max(R2s));
+                if length(ii) > 1
+                    ii = min(ii);
+                end
+                n_modes_to_use(j) = ii; % for selecting based on R^2 of predicted vs. observed
             elseif strcmp(mdl_pick_metric, 'RMSE') == 1
-                n_modes_to_use(j) = find(RMSEs == min(RMSEs)); % for selecting based on minimizing RMSE
+                ii = find(RMSEs == min(RMSEs));
+                if length(ii) > 1
+                    ii = min(ii);
+                end
+                n_modes_to_use(j) = ii; % for selecting based on minimizing RMSE
             elseif strcmp(mdl_pick_metric, 'avg') == 1
-                n_modes_to_use(j) = find(mean_percent_error == min(mean_percent_error)); % for selecting based on minimizing avg percent error
+                ii = find(mean_percent_error == min(mean_percent_error));
+                if length(ii) > 1
+                    ii = min(ii);
+                end
+                n_modes_to_use(j) = ii; % for selecting based on minimizing avg percent error
             elseif strcmp(mdl_pick_metric, 'med') == 1
-                n_modes_to_use(j) = find(median_percent_error == min(median_percent_error)); % for selecting based on minimizing median percent error
+                ii = find(median_percent_error == min(median_percent_error));
+                if length(ii) > 1
+                    ii = min(ii);
+                end
+                n_modes_to_use(j) = ii; % for selecting based on minimizing median percent error
             end
 
             % apply your optimized model and record the g.o.f. statistics for this k-th CV:
